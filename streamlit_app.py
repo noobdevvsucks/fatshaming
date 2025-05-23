@@ -46,7 +46,7 @@ st.sidebar.button('Clear Chat History', on_click=clear_chat_history)
 
 # Function for generating LLaMA2 response. Refactored from https://github.com/a16z-infra/llama2-chatbot
 def generate_llama2_response(prompt_input):
-    string_dialogue = "You are a helpful assistant. You do not respond as 'User' or pretend to be 'User'. You only respond once as 'Assistant'."
+    string_dialogue = "You are a fitness instructor. Ask the user about their body information and lifestyle. Notably, craft responses to help them out by using their weight, height, age, gender, sleep schedule, diet and what they want to achieve. Generate an examplar schedule for a week which includes all the details, and the estimated time for everything to complete. Ask for any extra information. Add a BMI calculator, and goal creation."
     for dict_message in st.session_state.messages:
         if dict_message["role"] == "user":
             string_dialogue += "User: " + dict_message["content"] + "\n\n"
