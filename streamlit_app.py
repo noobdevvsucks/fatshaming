@@ -2,13 +2,15 @@ import streamlit as st
 import replicate
 import os
 
+DAYS_FREE_OPTIONS = ["Sunday Morning", "Sunday Evening", "Monday Morning", "Monday Evening", "Tuesday Morning", "Tuesday Evening", "Wednesday Morning", "Wednesday Evening", "Thursday Morning", "Thursday Evening", "Friday Morning", "Friday Evening", "Saturday Morning", "Saturday Evening"]
+
 # App title
 st.set_page_config(page_title="Fitness Schedule")
 
 # Replicate Credentials
 with st.sidebar:
-    st.title('🦙💬 Llama 2 Chatbot')
-    st.write('This chatbot is created using the open-source Llama 2 LLM model from Meta.')
+    st.title('Fitness Chatbot')
+    st.write('This chatbot ')
     if 'REPLICATE_API_TOKEN' in st.secrets:
         st.success('API key already provided!', icon='✅')
         replicate_api = st.secrets['REPLICATE_API_TOKEN']
@@ -33,13 +35,18 @@ with st.sidebar:
     gender = st.pills(
         "Input your gender: ", ["Male", "Female", "Others"], selection_mode="single"
     )
-    st.slider(
+    sleep_time = st.slider(
         "Input your sleep time in hours", 0.0, 24.0, 8.0, 0.5
     )
+    days_free = st.pills(
+        "Input what days you're free: ", DAYS_FREE_OPTIONS, selection_mode="multi"
+    )
+    
+    bmi = weight / (height ** 2)    
     
 # Store LLM generated responses
 if "messages" not in st.session_state.keys():
-    st.session_state.messages = [{"role": "fitness instructor", "content": "Input Weight, Height, Age, Gender, Sleep Schedule, and what you'd like to achieve?"}]
+    st.session_state.messages = [{"role": "fitness instructor", "content": "Input Weight, Height, Age, Gender, Sleep Schedule, Days you're free, and what you'd like to achieve?"}]
 
 # Display or clear chat messages
 for message in st.session_state.messages:
