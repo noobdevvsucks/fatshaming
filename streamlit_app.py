@@ -38,7 +38,7 @@ with st.sidebar:
     sleep_time = st.slider(
         "Input your sleep time in hours", 0.0, 24.0, 8.0, 0.5
     )
-    days_free = st.pills(
+    days_free = st.multiselect(
         "Input what days you're free: ", DAYS_FREE_OPTIONS, selection_mode="multi"
     )
     
