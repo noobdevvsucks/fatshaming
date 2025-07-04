@@ -22,21 +22,24 @@ with st.sidebar:
 
     llm = 'a16z-infra/llama13b-v2-chat:df7690f1994d94e96ad9d568eac121aecf50684a0b0963b25a41cc40061269e5'
     weight = st.number_input(
-        "Input your weight: ", value=None, placeholder="Ur fat"
+        "Input your weight: ", value=None, placeholder="Your weight"
     )
     height = st.number_input(
-        "Input your height: ", value=None, placeholder="Ur short"
+        "Input your height: ", value=None, placeholder="Your height"
     )
     age = st.number_input(
-        "Input your age: ", value=None, placeholder="Unc"
+        "Input your age: ", value=None, placeholder="Your age"
     )
     gender = st.pills(
-        "Gender: ", ["Male", "Female", "Skill Issue"], selection_mode="single"
+        "Input your gender: ", ["Male", "Female", "Others"], selection_mode="single"
+    )
+    sleep_time = st.slider(
+        "Input your sleep time(in hours): ", 0.0, 24.0, 8, 0.5
     )
 
 # Store LLM generated responses
 if "messages" not in st.session_state.keys():
-    st.session_state.messages = [{"role": "fitness instructor", "content": "Input Weight, Height, Age, Gender, Sleep Schedule, Diet, and what you'd like to achieve?"}]
+    st.session_state.messages = [{"role": "fitness instructor", "content": "Input Weight, Height, Age, Gender, Sleep Schedule, and what you'd like to achieve?"}]
 
 # Display or clear chat messages
 for message in st.session_state.messages:
@@ -44,7 +47,7 @@ for message in st.session_state.messages:
         st.write(message["content"])
 
 def clear_chat_history():
-    st.session_state.messages = [{"role": "fitness instructor", "content": "Input Weight, Height, Age, Gender, Sleep Schedule, Diet, and what you'd like to achieve?"}]
+    st.session_state.messages = [{"role": "fitness instructor", "content": "Input Weight, Height, Age, Gender, Sleep Schedule, and what you'd like to achieve?"}]
 st.sidebar.button('Clear Chat History', on_click=clear_chat_history)
 
 # Function for generating LLaMA2 response. Refactored from https://github.com/a16z-infra/llama2-chatbot
