@@ -24,6 +24,15 @@ with st.sidebar:
     weight = st.number_input(
         "Input your weight: ", value=None, placeholder="Ur fat"
     )
+    height = st.number_input(
+        "Input your height: ", value=None, placeholder="Ur short"
+    )
+    age = st.number_input(
+        "Input your age: ", value=None, placeholder="Unc"
+    )
+    gender = st.pills(
+        "Gender: ", ["Male", "Female", "Skill Issue"], selection_mode="single"
+    )
 
 # Store LLM generated responses
 if "messages" not in st.session_state.keys():
