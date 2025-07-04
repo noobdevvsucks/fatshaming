@@ -25,7 +25,7 @@ with st.sidebar:
     #top_p = st.sidebar.slider('top_p', min_value=0.01, max_value=1.0, value=0.9, step=0.01)
     #max_length = st.sidebar.slider('max_length', min_value=20, max_value=80, value=50, step=5)
     #st.markdown('📖 Learn how to build this app in this [blog](https://blog.streamlit.io/how-to-build-a-llama-2-chatbot/)!')
-    weight = st.sidebar.slider('weight',min_value=10,max_value
+    weight = st.sidebar.slider('weight',min_value=10,max_value)
 
 # Store LLM generated responses
 if "messages" not in st.session_state.keys():
