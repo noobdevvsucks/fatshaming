@@ -39,7 +39,7 @@ with st.sidebar:
         "Input your sleep time in hours", 0.0, 24.0, 8.0, 0.5
     )
     days_free = st.multiselect(
-        "Input what days you're free: ", DAYS_FREE_OPTIONS, selection_mode="multi"
+        "Input what days you're free: ", DAYS_FREE_OPTIONS
     )
     
     bmi = weight / (height ** 2)    
