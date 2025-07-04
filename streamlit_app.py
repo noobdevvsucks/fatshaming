@@ -24,13 +24,13 @@ with st.sidebar:
 
     llm = 'a16z-infra/llama13b-v2-chat:df7690f1994d94e96ad9d568eac121aecf50684a0b0963b25a41cc40061269e5'
     weight = st.number_input(
-        "Input your weight: ", value=None, placeholder="Your weight"
+        "Input your weight: ", value=0, placeholder="Your weight"
     )
     height = st.number_input(
-        "Input your height: ", value=100, placeholder="Your height"
+        "Input your height: ", value=0, placeholder="Your height"
     )
     age = st.number_input(
-        "Input your age: ", value=None, placeholder="Your age"
+        "Input your age: ", value=0, placeholder="Your age"
     )
     gender = st.pills(
         "Input your gender: ", ["Male", "Female", "Others"], selection_mode="single"
