@@ -27,7 +27,7 @@ with st.sidebar:
         "Input your weight: ", value=None, placeholder="Your weight"
     )
     height = st.number_input(
-        "Input your height: ", value=None, placeholder="Your height"
+        "Input your height: ", value=100, placeholder="Your height"
     )
     age = st.number_input(
         "Input your age: ", value=None, placeholder="Your age"
