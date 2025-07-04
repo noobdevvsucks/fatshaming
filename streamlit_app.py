@@ -20,11 +20,14 @@ with st.sidebar:
             st.success('Proceed to entering your prompt message!', icon='👉')
     os.environ['REPLICATE_API_TOKEN'] = replicate_api
 
-    llm = 'a16z-infra/llama13b-v2-chat:df7690f1994d94e96ad9d568eac121aecf50684a0b0963b25a41cc40061269e5'    
-    
+    llm = 'a16z-infra/llama13b-v2-chat:df7690f1994d94e96ad9d568eac121aecf50684a0b0963b25a41cc40061269e5'
+    weight = st.number_input(
+        "Input your weight: ", value=None, placeholder="Ur fat")
+    )
+
 # Store LLM generated responses
 if "messages" not in st.session_state.keys():
-    st.session_state.messages = [{"role": "fitness instructor", "content": "What would you like to achieve?"}]
+    st.session_state.messages = [{"role": "fitness instructor", "content": "Input Weight, Height, Age, Gender, Sleep Schedule, Diet, and what you'd like to achieve?"}]
 
 # Display or clear chat messages
 for message in st.session_state.messages:
@@ -32,7 +35,7 @@ for message in st.session_state.messages:
         st.write(message["content"])
 
 def clear_chat_history():
-    st.session_state.messages = [{"role": "fitness instructor", "content": "Input Weight, Height, Age, Gender, Sleep Schedule, Diet, and what you'd like to achieve!"}]
+    st.session_state.messages = [{"role": "fitness instructor", "content": "Input Weight, Height, Age, Gender, Sleep Schedule, Diet, and what you'd like to achieve?"}]
 st.sidebar.button('Clear Chat History', on_click=clear_chat_history)
 
 # Function for generating LLaMA2 response. Refactored from https://github.com/a16z-infra/llama2-chatbot
