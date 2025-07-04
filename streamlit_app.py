@@ -33,10 +33,10 @@ with st.sidebar:
     gender = st.pills(
         "Input your gender: ", ["Male", "Female", "Others"], selection_mode="single"
     )
-    sleep_time = st.slider(
-        "Input your sleep time(in hours): ", 0.0, 24.0, 8, 0.5
+    st.slider(
+        "Input your sleep time in hours", 0.0, 24.0, 8.0, 0.5
     )
-
+    
 # Store LLM generated responses
 if "messages" not in st.session_state.keys():
     st.session_state.messages = [{"role": "fitness instructor", "content": "Input Weight, Height, Age, Gender, Sleep Schedule, and what you'd like to achieve?"}]
