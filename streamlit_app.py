@@ -2,20 +2,17 @@ import streamlit as st
 import replicate
 import os
 
-# Set up Replicate API Token
+# Streamlit page configuration
+st.set_page_config(page_title="Personalized Fitness Assistant")
+
+# Replicate API token setup
 if 'REPLICATE_API_TOKEN' in st.secrets:
     replicate_api = st.secrets['REPLICATE_API_TOKEN']
 else:
     replicate_api = st.text_input('Enter Replicate API token:', type='password')
 
-if not replicate_api:
-    st.warning("Please enter your Replicate API token to continue.")
-    st.stop()
-
-os.environ['REPLICATE_API_TOKEN'] = replicate_api
-
-# Streamlit page configuration
-st.set_page_config(page_title="Personalized Fitness Assistant")
+if replicate_api:
+    os.environ['REPLICATE_API_TOKEN'] = replicate_api
 
 # Session state for page navigation
 if "page" not in st.session_state:
@@ -37,65 +34,67 @@ if st.session_state.page == "form":
         complete = st.form_submit_button("Complete")
 
     if complete:
-        st.session_state.user_data = {
+        bmi = weight / (height ** 2)
+        # Calculate fitness score
+        def calculate_fitness_score(user_data):
+            score = 0
+            age = user_data["age"]
+            bmi = user_data["bmi"]
+
+            # Age scoring
+            if age <= 30:
+                score += 15
+            elif age <= 45:
+                score += 10
+            elif age <= 60:
+                score += 5
+            else:
+                score += 2
+
+            # BMI scoring
+            if 18.5 <= bmi <= 24.9:
+                score += 15
+            else:
+                score += 5
+
+            # Equipment scoring
+            eq_map = {
+                "None": 0,
+                "Some (e.g. dumbbells, bands)": 10,
+                "Full gym access": 20
+            }
+            score += eq_map.get(user_data["equipment"], 0)
+            return score
+
+        user_data = {
             "weight": weight,
             "height": height,
             "age": age,
             "gender": gender,
             "days_free": days_free,
-            "bmi": (weight / (height ** 2)),
+            "bmi": bmi,
             "experience": experience,
             "duration": duration,
             "equipment": equipment,
         }
+
+        fitness_score = calculate_fitness_score(user_data)
+        user_data["fitness_score"] = fitness_score
+
+        st.session_state.user_data = user_data
         st.session_state.page = "chat"
         st.rerun()
 
-# Fitness Score Mapping
-eq_map = {
-    "None": 5,
-    "Some (e.g. dumbbells, bands)": 10,
-    "Full gym access": 15
-}
-
-def calculate_fitness_score(user_data):
-    score = 0
-    age = user_data["age"]
-    bmi = user_data["bmi"]
-
-    # Age scoring
-    if age <= 30:
-        score += 15
-    elif age <= 45:
-        score += 10
-    elif age <= 60:
-        score += 5
-    else:
-        score += 2
-
-    # BMI scoring
-    if 18.5 <= bmi <= 24.9:
-        score += 15
-    else:
-        score += 5
-
-    # Equipment scoring
-    score += eq_map.get(user_data["equipment"], 0)
-
-    return score
-
-# Calculate fitness score only once
-if "user_data" in st.session_state and "fitness_score" not in st.session_state.user_data:
-    st.session_state.user_data["fitness_score"] = calculate_fitness_score(st.session_state.user_data)
-
 # Step 2: Chatbot Page
-if st.session_state.page == "chat":
+elif st.session_state.page == "chat":
     st.title("Personalized Fitness Chatbot 💬")
 
     user = st.session_state.user_data
+
+    # Display profile information
     st.write(f"**BMI**: {round(user['bmi'], 2)}")
-    st.write(f"**Free Days**: {', '.join(user['days_free'])}")
     st.write(f"**Fitness Score**: {user['fitness_score']}/80")
+    st.write(f"**Free Days**: {', '.join(user['days_free'])}")
 
     if "messages" not in st.session_state:
         st.session_state.messages = [{
@@ -103,32 +102,34 @@ if st.session_state.page == "chat":
             "content": "Hi! How can I assist you with your fitness journey today?"
         }]
 
+    # Display previous chat history
     for message in st.session_state.messages:
         with st.chat_message(message["role"]):
             st.write(message["content"])
 
-    def generate_llama_response(prompt_input):
-        user = st.session_state.user_data
-        user_input = prompt_input
+    # Function to generate LLaMA response
+    def generate_llama_response(user_input):
         context = (
             f"The user is {user['age']} years old with a BMI of {round(user['bmi'], 2)}.\n"
             f"They have {user['experience']} fitness experience, typically work out for {user['duration']} minutes, "
             f"and are free on {', '.join(user['days_free'])}.\n"
-            f"Fitness Score: {user['fitness_score']}/80.\n\n"
-            f"Time per workout: {user['duration']}\n"
-            f"Equipment open to user: {user['equipment']}\n"
-            f"User's question: {user_input}\n\nRespond as a friendly fitness coach."
+            f"Fitness Score: {user['fitness_score']}/80.\n"
+            f"Equipment available: {user['equipment']}.\n"
+            f"User's question: {user_input}\n\n"
+            f"Respond as a friendly fitness coach with practical advice."
         )
+
         try:
             response = replicate.run(
                 "a16z-infra/llama2-v2-chat:latest",
-                input={"prompt": context + "\nAssistant:", "temperature": 0.7, "max_length": 150}
+                input={"prompt": context + "\nAssistant:", "temperature": 0.7, "max_length": 300}
             )
             return ''.join(response)
         except replicate.exceptions.ReplicateError as e:
             st.error(f"Error: {e}")
             return "Sorry, there was an error processing your request. Please try again later."
 
+    # Handle chat input
     if prompt := st.chat_input("Ask me anything about your fitness plan!"):
         st.session_state.messages.append({"role": "user", "content": prompt})
         with st.chat_message("user"):
@@ -136,4 +137,5 @@ if st.session_state.page == "chat":
         with st.chat_message("fitness instructor"):
             with st.spinner("Thinking..."):
                 reply = generate_llama_response(prompt)
-                st.write(rep
+                st.write(reply)
+                st.session_state.messages.append({"role": "fitness instructor", "content": reply})
