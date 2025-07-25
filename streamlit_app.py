@@ -1,24 +1,24 @@
 import streamlit as st
-import replicate
 import os
+import google.generativeai as genai
 
-# Streamlit page configuration
+# Set page config
 st.set_page_config(page_title="Personalized Fitness Assistant")
 
-# Replicate API token setup
-if 'REPLICATE_API_TOKEN' in st.secrets:
-    replicate_api = st.secrets['REPLICATE_API_TOKEN']
+# Handle Gemini API key
+if 'GEMINI_API_KEY' in st.secrets:
+    gemini_api_key = st.secrets['GEMINI_API_KEY']
 else:
-    replicate_api = st.text_input('Enter Replicate API token:', type='password')
+    gemini_api_key = st.text_input("Enter Gemini API key:", type="password")
 
-if replicate_api:
-    os.environ['REPLICATE_API_TOKEN'] = replicate_api
+if gemini_api_key:
+    genai.configure(api_key=gemini_api_key)
 
 # Session state for page navigation
 if "page" not in st.session_state:
     st.session_state.page = "form"
 
-# Step 1: Personal Info Form
+# Step 1: User Input Form
 if st.session_state.page == "form":
     st.title("Create Your Fitness Profile")
 
@@ -35,13 +35,13 @@ if st.session_state.page == "form":
 
     if complete:
         bmi = weight / (height ** 2)
-        # Calculate fitness score
+
+        # Fitness score logic
         def calculate_fitness_score(user_data):
             score = 0
             age = user_data["age"]
             bmi = user_data["bmi"]
 
-            # Age scoring
             if age <= 30:
                 score += 15
             elif age <= 45:
@@ -51,13 +51,11 @@ if st.session_state.page == "form":
             else:
                 score += 2
 
-            # BMI scoring
             if 18.5 <= bmi <= 24.9:
                 score += 15
             else:
                 score += 5
 
-            # Equipment scoring
             eq_map = {
                 "None": 0,
                 "Some (e.g. dumbbells, bands)": 10,
@@ -91,7 +89,6 @@ elif st.session_state.page == "chat":
 
     user = st.session_state.user_data
 
-    # Display profile information
     st.write(f"**BMI**: {round(user['bmi'], 2)}")
     st.write(f"**Fitness Score**: {user['fitness_score']}/80")
     st.write(f"**Free Days**: {', '.join(user['days_free'])}")
@@ -99,47 +96,43 @@ elif st.session_state.page == "chat":
     if "messages" not in st.session_state:
         st.session_state.messages = [{
             "role": "fitness instructor",
-            "content": "Hi! How can I assist you with your fitness journey today?"
+            "content": "Hi! I'm your fitness coach. How can I help you reach your goals today?"
         }]
 
-    # Display previous chat history
     for message in st.session_state.messages:
         with st.chat_message(message["role"]):
             st.write(message["content"])
 
-    # Function to generate LLaMA response
-    def generate_llama_response(user_input):
-        context = (
-            f"The user is {user['age']} years old with a BMI of {round(user['bmi'], 2)}.\n"
-            f"They have {user['experience']} fitness experience, typically work out for {user['duration']} minutes, "
-            f"and are free on {', '.join(user['days_free'])}.\n"
-            f"Fitness Score: {user['fitness_score']}/80.\n"
-            f"Equipment available: {user['equipment']}.\n"
+    # Function to generate Gemini response
+    def generate_gemini_response(user_input, user):
+        prompt = (
+            f"You are a friendly and professional fitness instructor.\n"
+            f"User details:\n"
+            f"- Age: {user['age']} years\n"
+            f"- BMI: {round(user['bmi'], 2)}\n"
+            f"- Experience: {user['experience']}\n"
+            f"- Duration: {user['duration']} minutes per session\n"
+            f"- Free Days: {', '.join(user['days_free'])}\n"
+            f"- Equipment: {user['equipment']}\n"
+            f"- Fitness Score: {user['fitness_score']}/80\n\n"
             f"User's question: {user_input}\n\n"
-            f"Respond as a friendly fitness coach with practical advice."
+            f"Respond in a supportive, motivating tone. Be specific and actionable."
         )
 
         try:
-            response = replicate.run(
-            "meta/meta-llama-3-8b-instruct",
-            input={
-            "prompt": context + "\nAssistant:",
-            "temperature": 0.7,
-            "top_p": 1,
-            "max_new_tokens": 300}
-            )
-            return ''.join(response)
-        except replicate.exceptions.ReplicateError as e:
-            st.error(f"Error: {e}")
-            return "Sorry, there was an error processing your request. Please try again later."
+            model = genai.GenerativeModel('gemini-pro')
+            response = model.generate_content(prompt)
+            return response.text
+        except Exception as e:
+            st.error(f"Gemini API Error: {e}")
+            return "Sorry, I couldn't generate a response. Please try again later."
 
-    # Handle chat input
     if prompt := st.chat_input("Ask me anything about your fitness plan!"):
         st.session_state.messages.append({"role": "user", "content": prompt})
         with st.chat_message("user"):
             st.write(prompt)
         with st.chat_message("fitness instructor"):
-            with st.spinner("Thinking..."):
-                reply = generate_llama_response(prompt)
+            with st.spinner("Generating response..."):
+                reply = generate_gemini_response(prompt, user)
                 st.write(reply)
                 st.session_state.messages.append({"role": "fitness instructor", "content": reply})
