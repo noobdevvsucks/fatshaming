@@ -129,8 +129,6 @@ elif st.session_state.page == "chat":
             "max_new_tokens": 300
             }
             )
-    }
-)
             return ''.join(response)
         except replicate.exceptions.ReplicateError as e:
             st.error(f"Error: {e}")
