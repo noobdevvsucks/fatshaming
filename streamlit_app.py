@@ -70,7 +70,7 @@ def calculate_fitness_score(user_data):
         score += 15
     else:
         score += 5
-    }
+    
     score += eq_map.get(user_data["equipment"], 0)
 
 fitness_score = calculate_fitness_score(st.session_state.user_data)
