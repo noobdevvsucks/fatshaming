@@ -121,7 +121,7 @@ elif st.session_state.page == "chat":
 
         try:
             response = replicate.run(
-            "meta/llama-2-7b-chat",
+            "meta/meta-llama-3-8b-instruct",
             input={
             "prompt": context + "\nAssistant:",
             "temperature": 0.7,
