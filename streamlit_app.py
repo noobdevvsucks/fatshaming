@@ -78,9 +78,9 @@ st.write(f"**Fitness Score**: {fitness_score}/80")
 
 
 # Step 2: Chatbot Page (Simplified)
-=======
+
 # Step 2: Chatbot Page
->>>>>>> master
+
 elif st.session_state.page == "chat":
     st.title("Personalized Fitness Chatbot 💬")
 
