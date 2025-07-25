@@ -88,7 +88,7 @@ elif st.session_state.page == "chat":
 
     # Display profile information
     st.write(f"**BMI**: {round(st.session_state.user_data['bmi'], 2)}")
-    st.write(f"**Free Days**: {', '.join(st.session_state.user_data['days_free'])}")]
+    st.write(f"**Free Days**: {', '.join(st.session_state.user_data['days_free'])}")
     
     if "messages" not in st.session_state:
         st.session_state.messages = [{
