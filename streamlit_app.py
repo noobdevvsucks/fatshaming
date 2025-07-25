@@ -120,15 +120,15 @@ elif st.session_state.page == "chat":
         )
 
         try:
-            response = replicate.run(
-            "meta/llama-2-13b-chat",
-            input={
-            "prompt": context + "\nAssistant:",
-            "temperature": 0.7,
-            "top_p": 1,
-            "max_new_tokens": 300
-            }
-            )
+           response = replicate.run(
+    "meta/llama-2-7b-chat",
+    input={
+        "prompt": context + "\nAssistant:",
+        "temperature": 0.7,
+        "top_p": 1,
+        "max_new_tokens": 300
+    }
+)
             return ''.join(response)
         except replicate.exceptions.ReplicateError as e:
             st.error(f"Error: {e}")
