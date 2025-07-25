@@ -48,8 +48,6 @@ if st.session_state.page == "form":
         st.session_state.page = "chat"
         st.rerun()
 
-<<<<<<< noobdevvsucks-patch-1
-
 def calculate_fitness_score(user_data):
     score = 0
     age = user_data["age"]
