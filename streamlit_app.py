@@ -40,7 +40,7 @@ if st.session_state.page == "form":
             "age": age,
             "gender": gender,
             "days_free": days_free,
-            "bmi": weight / (height ** 2)
+            "bmi": (weight / (height ** 2)),
             "experience": experience,
             "duration": duration,
             "equipment": equipment,
